@@ -20,14 +20,30 @@ public class Exemple1 {
 		words.add("cure");
 		words.add("abacate");
 		words.add("keyboard");
+		words.add("batatinha");
+		words.add("airplane");
 		words.add("motorcycle");
 		words.add("cat");
 		words.add("dog");
+		words.add("listerine");
 		for (int i = 0; i < words.size();i++){
 			String word = words.get(i);
 			if (i < getHalfOfList()) {
 				//insert horizontal word
-				for (int j = 0;j < word.length(); j++) mat[i][j] = word.charAt(j)+"";
+				//for (int j = 0;j < word.length(); j++) mat[i][j] = word.charAt(j)+"";
+				boolean inserted = false;
+				for (int iPos = 0; iPos < 20; iPos++) {
+					for (int jPos = getNextFreeI(iPos); jPos < 20; jPos++){
+						if (doesWordFitOnIPosition(word, iPos, jPos)) {
+							System.out.println(word + " fits");
+							insertHorizontalWord(word, iPos, jPos);
+							inserted = true;
+						}
+						if (inserted) break;
+					}
+					if (inserted) break;
+				}
+				if (!inserted) System.out.println("Word " + word + "does not fit");
 			}
 			else {
 				//insert vertical word
@@ -48,6 +64,17 @@ public class Exemple1 {
 		}
 		printMatrix();
 	}
+	
+	private static void insertHorizontalWord(String word, int iPos, int jPosInitial) {
+		int j = jPosInitial;
+		
+		for (int w = 0; w < word.length(); w++){
+			mat[iPos][j] = word.charAt(w)+"";
+			j++;
+		}
+		
+	}
+	
 	private static void insertVerticalWord(String word, int iPosInitial, int jPos) {
 		int i = iPosInitial;
 		for (int l = 0; l < word.length(); l++){
@@ -59,6 +86,13 @@ public class Exemple1 {
 	private static int getNextFreeJ(int i) {
 		for (int pos = 0 ; pos < 20; pos ++) 
 			if (mat[i][pos] == null) return pos + 1;
+		return 0;
+	}
+	
+	//vertical
+	private static int getNextFreeI(int j) {
+		for (int pos = 0 ; pos < 20; pos ++) 
+			if (mat[j][pos] == null) return pos + 1;
 		return 0;
 	}
 
@@ -124,6 +158,24 @@ public class Exemple1 {
 				fits = false;
 			}
 			iPos++;
+		}
+		return fits;
+	}
+	
+	private static boolean doesWordFitOnIPosition(String word, int i, int j){
+		if (i + word.length() > 20) return false;
+		boolean fits = true;
+		int iPos = i;
+		int jPos = j;
+		for (int pos = 0; pos < word.length(); pos ++) {
+			if (jPos >= 19) {
+				fits = false;
+				break;
+			}
+			if(!isPositionFree(iPos, jPos) || isThereNearWord(iPos, jPos)){
+				fits = false;
+			}
+			jPos++;
 		}
 		return fits;
 	}

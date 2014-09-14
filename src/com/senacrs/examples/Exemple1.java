@@ -1,5 +1,7 @@
 package com.senacrs.examples;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -11,58 +13,63 @@ public class Exemple1 {
 	static List<String> words = new ArrayList<String>();
 
 	public static void main(String[] args) {
-	    //System.out.println("Read from file or from keyboard?");
-	    //String option = input.next();
-//	    if (option.equals("file"))
-//	    	readFromFile();
-//	    else readFromKeyboard();
+	    System.out.println("Read from file or from keyboard?");
+	    String option = input.next();
+	    if (option.equals("file")) 
+	    	readFromFile();
+	    else readFromKeyboard();
 		
-		words.add("cure");
-		words.add("abacate");
-		words.add("keyboard");
-		words.add("batatinha");
-		words.add("airplane");
-		words.add("motorcycle");
-		words.add("cat");
-		words.add("dog");
-		words.add("listerine");
+//		words.add("cure");
+//		words.add("abacate");
+//		words.add("keyboard");
+//		words.add("batatinha");
+//		words.add("airplane");
+//		words.add("motorcycle");
+//		words.add("cat");
+//		words.add("dog");
+//		words.add("listerine");
 		for (int i = 0; i < words.size();i++){
 			String word = words.get(i);
 			if (i < getHalfOfList()) {
-				//insert horizontal word
-				//for (int j = 0;j < word.length(); j++) mat[i][j] = word.charAt(j)+"";
-				boolean inserted = false;
-				for (int iPos = 0; iPos < 20; iPos++) {
-					for (int jPos = getNextFreeI(iPos); jPos < 20; jPos++){
-						if (doesWordFitOnIPosition(word, iPos, jPos)) {
-							System.out.println(word + " fits");
-							insertHorizontalWord(word, iPos, jPos);
-							inserted = true;
-						}
-						if (inserted) break;
-					}
-					if (inserted) break;
-				}
-				if (!inserted) System.out.println("Word " + word + "does not fit");
+				checkAndInsertHorizontalWord(word);
 			}
 			else {
-				//insert vertical word
-				boolean inserted = false;
-				for (int iPos = 0; iPos < 20; iPos++) {
-					for (int jPos = getNextFreeJ(iPos); jPos < 20; jPos++){
-						if (doesWordFitOnJPosition(word, iPos, jPos)) {
-							System.out.println(word + " fits");
-							insertVerticalWord(word, iPos, jPos);
-							inserted = true;
-						}
-						if (inserted) break;
-					}
-					if (inserted) break;
-				}
-				if (!inserted) System.out.println("Word " + word + "does not fit");
+				checkAndInsertVerticalWord(word);
 			}
 		}
 		printMatrix();
+	}
+
+	private static void checkAndInsertVerticalWord(String word) {
+		boolean inserted = false;
+		for (int iPos = 0; iPos < 20; iPos++) {
+			for (int jPos = getNextFreeJ(iPos); jPos < 20; jPos++){
+				if (doesWordFitOnJPosition(word, iPos, jPos)) {
+					System.out.println(word + " fits");
+					insertVerticalWord(word, iPos, jPos);
+					inserted = true;
+				}
+				if (inserted) break;
+			}
+			if (inserted) break;
+		}
+		if (!inserted) System.out.println("Word " + word + "does not fit");
+	}
+
+	private static void checkAndInsertHorizontalWord(String word) {
+		boolean inserted = false;
+		for (int iPos = 0; iPos < 20; iPos++) {
+			for (int jPos = getNextFreeI(iPos); jPos < 20; jPos++){
+				if (doesWordFitOnIPosition(word, iPos, jPos)) {
+					System.out.println(word + " fits");
+					insertHorizontalWord(word, iPos, jPos);
+					inserted = true;
+				}
+				if (inserted) break;
+			}
+			if (inserted) break;
+		}
+		if (!inserted) System.out.println("Word " + word + "does not fit");
 	}
 	
 	private static void insertHorizontalWord(String word, int iPos, int jPosInitial) {
@@ -108,8 +115,22 @@ public class Exemple1 {
 		return words.size()/2;
 	}
 
-//	private static void readFromFile() {
-//	}
+	private static void readFromFile() {
+		System.out.println("Please enter the file path: ");
+		String file_path = input.next();
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new FileReader(file_path));
+			String line = br.readLine();
+			while (line != null) {
+				words.add(line);
+				line = br.readLine();
+			}
+			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+	    }
+	}
 
 	private static void readFromKeyboard() {
 		String option = "";
@@ -154,9 +175,7 @@ public class Exemple1 {
 		int iPos = i;
 		int jPos = j;
 		for (int pos = 0; pos < word.length(); pos ++) {
-			if(!isPositionFree(iPos, jPos) || isThereNearWord(iPos, jPos)){
-				fits = false;
-			}
+			if(!isPositionFree(iPos, jPos) || isThereNearWord(iPos, jPos)) fits = false;
 			iPos++;
 		}
 		return fits;
@@ -172,9 +191,7 @@ public class Exemple1 {
 				fits = false;
 				break;
 			}
-			if(!isPositionFree(iPos, jPos) || isThereNearWord(iPos, jPos)){
-				fits = false;
-			}
+			if(!isPositionFree(iPos, jPos) || isThereNearWord(iPos, jPos)) fits = false;
 			jPos++;
 		}
 		return fits;
